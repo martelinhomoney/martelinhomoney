@@ -51,7 +51,8 @@ h1:focus{outline:none}
 .top{display:grid; grid-template-columns:44px 1fr 44px; align-items:center; padding-block:12px 10px}
 .back{width:44px; height:44px; border:0; border-radius:50%; background:transparent; color:var(--ink); display:grid; place-items:center; cursor:pointer}
 .back:hover{background:var(--trk)}
-.brand{justify-self:center; display:flex; align-items:center; gap:8px; font-family:var(--display); font-weight:800; font-size:clamp(16px, 5.2vw, 21px); letter-spacing:.06em; text-transform:uppercase; line-height:1; white-space:nowrap}
+.brand{justify-self:center; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:var(--display); font-weight:800; font-size:clamp(16px, 5.2vw, 21px); letter-spacing:.06em; text-transform:uppercase; line-height:1; white-space:nowrap}
+.brand img{display:block; width:80px; height:60px; object-fit:contain}
 .brand b{color:var(--gold-deep); font-weight:800}
 .bar{height:6px; background:var(--line); border-radius:3px; overflow:hidden}
 .bar i{display:block; height:100%; width:0; background:var(--gold); border-radius:3px; transition:width .4s ease}
@@ -303,6 +304,7 @@ h1.hm, h2.hm, h1:has(mark){line-height:1.28 !important}
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
       </button>
       <div class="brand" aria-label="Martelinho Money">
+        <img src="img/logo-removebg-preview.png" alt="Logo Martelinho Money">
         <span>Martelinho <b>Money</b></span>
       </div>
       <span></span>
