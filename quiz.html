@@ -54,6 +54,7 @@ h1:focus{outline:none}
 .brand{justify-self:center; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:var(--display); font-weight:800; font-size:clamp(16px, 5.2vw, 21px); letter-spacing:.06em; text-transform:uppercase; line-height:1; white-space:nowrap}
 .brand img{display:block; width:min(200px, calc(100vw - 120px)); height:150px; object-fit:contain}
 .brand b{color:var(--gold-deep); font-weight:800}
+.app.vsl-active .brand{display:none}
 .bar{height:6px; background:var(--line); border-radius:3px; overflow:hidden}
 .bar i{display:block; height:100%; width:0; background:var(--gold); border-radius:3px; transition:width .4s ease}
 
@@ -274,6 +275,15 @@ h1.hm, h2.hm, h1:has(mark){line-height:1.28 !important}
 .pct .pv{font-family:var(--display); font-weight:800; font-size:44px; line-height:1; min-width:3.4ch; font-variant-numeric:tabular-nums}
 .pbar{flex:1; height:10px; border-radius:5px; background:var(--line); overflow:hidden}
 .pbar i{display:block; height:100%; width:0; background:var(--gold); border-radius:5px}
+.goal-modal{position:fixed; inset:0; z-index:30; display:grid; place-items:center; padding:20px; background:rgba(0,0,0,.78)}
+.goal-modal[hidden]{display:none}
+.goal-dialog{width:min(100%,420px); padding:22px 18px; border:1px solid var(--gold); border-radius:16px; background:var(--surface); box-shadow:0 18px 60px rgba(0,0,0,.45)}
+.goal-dialog .kicker{margin-bottom:10px}
+.goal-dialog h2{margin:0 0 16px; font:800 clamp(27px,8vw,34px)/1.05 var(--display); text-align:center; text-wrap:balance}
+.goal-options{display:grid; gap:8px}
+.goal-option{width:100%; min-height:44px; padding:10px 12px; border:1px solid var(--line); border-radius:9px; background:var(--dim-bg); color:var(--ink); font:600 15px/1.2 var(--text); text-align:left; cursor:pointer; transition:border-color .15s, background .15s}
+.goal-option[aria-pressed="true"]{border-color:var(--gold); background:var(--sel)}
+.goal-option:focus-visible{outline:3px solid var(--gold); outline-offset:2px}
 .steps{list-style:none; margin:22px 0 0; padding:0; display:grid; gap:12px}
 .steps li{display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--surface); border:1px solid var(--line); border-radius:10px; font-weight:600; color:var(--muted); transition:color .2s, border-color .2s}
 .steps .st{flex:none; width:26px; height:26px; border-radius:50%; border:2px solid var(--line); display:grid; place-items:center; color:transparent}
@@ -283,8 +293,7 @@ h1.hm, h2.hm, h1:has(mark){line-height:1.28 !important}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* vsl */
-.player{position:relative; width:100%; max-width:100%; aspect-ratio:16/9; background:var(--paint); border-radius:12px; overflow:hidden; display:grid; place-items:center; color:#fff}
-.player iframe, .player video, .player wistia-player{position:absolute; inset:-12px -4px -16px -4px; width:calc(100% + 8px); height:calc(100% + 28px); border:0}
+.player{position:relative; width:100%; max-width:420px; margin:0 auto; aspect-ratio:9/16; background:var(--paint); border-radius:12px; overflow:hidden; display:grid; place-items:center; color:#fff}
 .player .ph{display:grid; justify-items:center; gap:10px; padding:16px; text-align:center}
 .playbtn{width:68px; height:68px; border-radius:50%; background:var(--gold); color:var(--on-gold); display:grid; place-items:center}
 .player .ph p{margin:0; font-size:15px; opacity:.85}
@@ -319,9 +328,10 @@ h1.hm, h2.hm, h1:has(mark){line-height:1.28 !important}
 <script>
 /* ===== CONFIGURAÇÃO (edite aqui) ===== */
 const CONFIG = {
-  vslEmbed: '',          // cole aqui o código de embed da VSL (iframe ou script do player)
+  vslEmbed: '<div id="vsl-player_mwsfmwacpec9" class="vsl-hosted-player-embed" data-player-id="player_mwsfmwacpec9" data-base-url="https://vturb-shopee.ai.studio" style="position:relative;width:100%;max-width:420px;margin:0 auto;border-radius:14px;overflow:hidden;background:#000000;box-shadow:0 16px 40px rgba(0,0,0,0.3);aspect-ratio:9/16;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none">' +
+    '<script src="https://vturb-shopee.ai.studio/runtime/player.js" data-player-id="player_mwsfmwacpec9" async><\/script></div>',
   checkoutUrl: '',       // link de checkout do Martelinho Money
-  ctaDelaySeconds: 0,    // segundos até o botão de compra aparecer abaixo da VSL (0 = já aparece)
+  ctaTimeSeconds: 531,   // tempo assistido da VSL até liberar o botão (8:51)
   ctaLabel: 'Quero o Martelinho Money',
   leadUrl: 'https://script.google.com/macros/s/AKfycbylUrsJPJGZ64MbosOUlJWShqzYQhw2ERvMS8kzkJJFyWudFYQx6Puih6fAscfdsNxm/exec',
   leadFields: {          // nome do campo no seu formulário para cada informação
@@ -534,7 +544,7 @@ function rangeChart(){
       '<div class="cmp-v">R$ 300 a R$ 500</div>' +
       '<div class="cmp-trk"><span class="cmp-bar o" style="width:50%"></span></div></div>' +
     '<div class="cmp-row"><div class="cmp-t">Ganho em 2 dias de trabalho (1h por dia)<span class="pill g">Lucro no bolso</span></div>' +
-      '<div class="cmp-v g">Até R$ 600</div>' +
+      '<div class="cmp-v g">R$ 600 (ou mais)</div>' +
       '<div class="cmp-trk"><span class="cmp-bar g" style="width:100%"></span></div></div>' +
   '</div>';
 }
@@ -594,7 +604,7 @@ const screens = [
         '<div class="wa-avatar-container"><img src="img/dep-whats.jpg" alt="" class="wa-avatar"><span class="wa-mic-badge" aria-hidden="true">' +
           '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.23 14.47 16 12 16s-4.52-1.77-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>' +
         '</span></div>' +
-      '</div><audio id="jeferson-audio" class="wa-audio-native" preload="metadata" src="https://www.image2url.com/r2/default/audio/1794546725415-f568cedd-1ed6-4caf-ad0d-dfa543f22455.mp3"></audio></div>') },
+      '</div><audio id="jeferson-audio" class="wa-audio-native" preload="metadata" src="https://www.image2url.com/r2/default/audio/1795384119493-c9b38a75-14db-4367-b031-62be3d0722e9.mp3"></audio></div>') },
 
   { id:'prova35', html:() => proofScreen(
       '<h1 class="t" tabindex="-1">Lembra da conta que você acabou de ver?</h1>' +
@@ -626,6 +636,13 @@ const screens = [
       '<div class="kicker">Quase pronto</div>' +
       '<h1 class="t" tabindex="-1">Analisando suas respostas</h1>' +
       '<div class="pct"><span class="pv" id="pct">0%</span><div class="pbar"><i id="pbar"></i></div></div>' +
+      '<div class="goal-modal" id="goal-modal" hidden><div class="goal-dialog" role="dialog" aria-modal="true" aria-labelledby="goal-title">' +
+        '<div class="kicker">Uma pergunta rápida</div><h2 id="goal-title">Se você começasse a fazer reparos, o que gostaria de conquistar primeiro?</h2>' +
+        '<div class="goal-options" role="group" aria-label="Escolha seu primeiro objetivo">' +
+          '<button type="button" class="goal-option" data-goal="Aliviar as contas" aria-pressed="false">Aliviar as contas</button>' +
+          '<button type="button" class="goal-option" data-goal="Ajudar minha família" aria-pressed="false">Ajudar minha família</button>' +
+          '<button type="button" class="goal-option" data-goal="Ter mais liberdade" aria-pressed="false">Ter mais liberdade</button>' +
+        '</div></div></div>' +
       '<ul class="steps" id="steps">' +
         '<li><span class="st">' + ICON.check + '</span>Lendo suas respostas</li>' +
         '<li><span class="st">' + ICON.check + '</span>Avaliando sua experiência com reparos</li>' +
@@ -640,6 +657,7 @@ const screens = [
         const o = (OPTS[p[1]] || []).find(x => x.k === answers[p[0]]);
         if(o && o.s) chips.push('<span class="chip">' + o.s + '</span>');
       });
+      if(answers.objetivo) chips.push('<span class="chip">Seu objetivo: ' + answers.objetivo + '</span>');
       return '<section class="screen">' +
         '<div class="verdict"><span class="ok">' + ICON.check + '</span>' +
           '<h1 class="t" tabindex="-1" style="margin:0">Resultado: Você tem perfil pra começar.</h1></div>' +
@@ -673,6 +691,17 @@ const screens = [
 let idx = 0;
 const history = [];
 let timers = [];
+let analysisReady = false;
+let analysisGoalAnswered = false;
+let resumeAnalysis = null;
+let vslCtaCleanup = null;
+
+function finishAnalysis(){
+  if(!analysisReady || !analysisGoalAnswered || screens[idx].id !== 'analise') return;
+  analysisReady = false;
+  idx++;
+  render();
+}
 
 function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
 function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
@@ -702,6 +731,51 @@ function mountEmbed(el, html){
     s.text = old.text;
     old.replaceWith(s);
   });
+}
+
+function watchVslCta(host, button, revealAt){
+  let revealed = false;
+  const cleanups = [];
+  const reveal = () => {
+    if(revealed) return;
+    revealed = true;
+    button.hidden = false;
+  };
+  const onTime = event => {
+    const time = Number(event && event.detail && event.detail.time);
+    if(Number.isFinite(time) && time >= revealAt) reveal();
+  };
+  const listenForTime = target => {
+    if(!target || typeof target.addEventListener !== 'function') return;
+    target.addEventListener('video:timeupdate', onTime);
+    cleanups.push(() => target.removeEventListener('video:timeupdate', onTime));
+  };
+  const scheduleOnPlayer = player => {
+    if(!player || typeof player.onTime !== 'function') return;
+    try{ player.onTime(revealAt, reveal, {once:true}); }catch(e){}
+  };
+  const boundPlayers = new WeakSet();
+  const bindCustomPlayer = () => {
+    const customPlayer = host.querySelector('vturb-smartplayer');
+    if(!customPlayer || boundPlayers.has(customPlayer)) return;
+    boundPlayers.add(customPlayer);
+    listenForTime(customPlayer);
+    const onReady = event => scheduleOnPlayer(event.detail && event.detail.player || customPlayer);
+    customPlayer.addEventListener('player:ready', onReady, {once:true});
+    cleanups.push(() => customPlayer.removeEventListener('player:ready', onReady));
+  };
+  const observer = new MutationObserver(bindCustomPlayer);
+  observer.observe(host, {childList:true, subtree:true});
+  bindCustomPlayer();
+  const onIframeConnected = event => {
+    if(!event.detail || event.detail.id !== 'player_mwsfmwacpec9') return;
+    scheduleOnPlayer(event.detail.player);
+    listenForTime(event.target);
+  };
+  document.addEventListener('iframe:connected', onIframeConnected);
+  cleanups.push(() => document.removeEventListener('iframe:connected', onIframeConnected));
+  cleanups.push(() => observer.disconnect());
+  return () => cleanups.forEach(cleanup => cleanup());
 }
 
 function formatAudioTime(seconds){
@@ -777,7 +851,9 @@ function initTestimonialAudio(){
 
 function render(){
   clearTimers();
+  if(vslCtaCleanup){ vslCtaCleanup(); vslCtaCleanup = null; }
   const s = screens[idx];
+  document.querySelector('.app').classList.toggle('vsl-active', !!s.vsl);
   $stage.innerHTML = s.html ? s.html() : qScreen(s);
   $bar.style.width = Math.round((idx + 1) / screens.length * 100) + '%';
   $barwrap.setAttribute('aria-valuenow', Math.round((idx + 1) / screens.length * 100));
@@ -791,24 +867,51 @@ function render(){
   track('QuizStep', {step:s.id, index:idx + 1});
 
   if(s.loader){
+    analysisReady = false;
+    analysisGoalAnswered = !!answers.objetivo;
+    resumeAnalysis = null;
     const items = $stage.querySelectorAll('#steps li');
-    const gap = reduceMotion() ? 300 : 1500;
+    const gap = 1700;
     const total = items.length * gap + 600;
-    items.forEach((li, i) => {
-      later(() => li.classList.add('run'), i * gap);
-      later(() => { li.classList.remove('run'); li.classList.add('done'); }, i * gap + gap - 150);
-    });
     const pct = document.getElementById('pct'), pbar = document.getElementById('pbar');
     const t0 = performance.now();
+    const pauseAt = total * .6;
+    let elapsedBeforePause = 0;
+    let phaseStartedAt = t0;
+    let pausedElapsed = null;
+    if(!analysisGoalAnswered) resumeAnalysis = () => {
+      if(pausedElapsed === null) return;
+      elapsedBeforePause = pausedElapsed;
+      pausedElapsed = null;
+      phaseStartedAt = performance.now();
+      resumeAnalysis = null;
+    };
     (function tick(now){
       if(!pct.isConnected) return;
-      const p = Math.min(1, (now - t0) / (total - 300));
+      const elapsed = pausedElapsed === null ? elapsedBeforePause + now - phaseStartedAt : pausedElapsed;
+      const p = Math.min(1, elapsed / total);
+      items.forEach((li, i) => {
+        const stepStart = i * gap;
+        const stepDone = stepStart + gap - 150;
+        li.classList.toggle('run', elapsed >= stepStart && elapsed < stepDone);
+        li.classList.toggle('done', elapsed >= stepDone);
+      });
       const shown = Math.round(p * 100);
       pct.textContent = shown + '%';
       pbar.style.width = shown + '%';
       if(p < 1) requestAnimationFrame(tick);
+      else { analysisReady = true; finishAnalysis(); }
     })(t0);
-    later(() => { idx = idx + 1; render(); }, total);
+    if(!analysisGoalAnswered) later(() => {
+      const modal = document.getElementById('goal-modal');
+      if(!modal || idx !== screens.findIndex(screen => screen.id === 'analise')) return;
+      pausedElapsed = pauseAt;
+      pct.textContent = '60%';
+      pbar.style.width = '60%';
+      modal.hidden = false;
+      const firstOption = modal.querySelector('.goal-option');
+      if(firstOption) firstOption.focus();
+    }, Math.round(pauseAt));
   }
   if(s.id === 'resultado') track('QuizResult');
   if(s.id === 'prova1'){
@@ -824,10 +927,9 @@ function render(){
   if(s.vsl){
     track('ViewContent', {content_name:'VSL'});
     const player = document.getElementById('player');
-    if(CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
     const buy = document.getElementById('buy');
-    if(CONFIG.ctaDelaySeconds > 0) later(() => { buy.hidden = false; }, CONFIG.ctaDelaySeconds * 1000);
-    else buy.hidden = false;
+    if(player && buy) vslCtaCleanup = watchVslCta(player, buy, CONFIG.ctaTimeSeconds);
+    if(CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
   }
 }
 
@@ -843,6 +945,17 @@ function toast(msg){
 }
 
 $stage.addEventListener('click', e => {
+  const goal = e.target.closest('.goal-option');
+  if(goal){
+    answers.objetivo = goal.dataset.goal;
+    $stage.querySelectorAll('.goal-option').forEach(b => b.setAttribute('aria-pressed', String(b === goal)));
+    analysisGoalAnswered = true;
+    const modal = document.getElementById('goal-modal');
+    if(modal) modal.hidden = true;
+    if(resumeAnalysis) resumeAnalysis();
+    finishAnalysis();
+    return;
+  }
   const opt = e.target.closest('.opt');
   if(opt){
     const s = screens[idx];
