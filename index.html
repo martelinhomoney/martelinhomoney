@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0E1215">
   <title>Martelinho Money | Comece grátis</title>
+  <link rel="icon" href="img/logo-redonda.webp" type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
@@ -28,6 +29,7 @@
     footer{padding:8px 0 28px;color:var(--muted);font-size:12px;text-align:center;opacity:.8}
     :focus-visible{outline:3px solid var(--gold);outline-offset:3px}
   </style>
+  <script async src="https://painel-lucro-ten.vercel.app/tracker.js" data-pixel-id="c914e010-7791-40ee-bd8a-2d584587eaf5" data-pl-type="quiz_vsl" data-pl-consent="auto"></script>
 </head>
 <body>
   <div class="page">
@@ -40,11 +42,30 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         Leva menos de 2 minutos.
       </p>
-      <a class="cta" href="quiz.html">Comece grátis
+      <a class="cta" href="quiz.html" data-pl-event="QuizStart">Comece grátis
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </main>
     <footer>© 2026 MARTELINHO MONEY. Todos os direitos reservados.</footer>
   </div>
+  <script>
+  (function(){
+    const isFormField = target => !!(target && target.closest && target.closest('input,textarea,select,[contenteditable="true"]'));
+    const blockOutsideFields = event => { if(!isFormField(event.target)) event.preventDefault(); };
+    const style = document.createElement('style');
+    style.textContent = 'body,body *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default!important}';
+    document.head.appendChild(style);
+    ['contextmenu','copy','cut','selectstart'].forEach(type => document.addEventListener(type, blockOutsideFields, true));
+    document.addEventListener('dragstart', event => { if(event.target.closest && event.target.closest('img,video,a')) event.preventDefault(); }, true);
+    document.addEventListener('keydown', event => {
+      const key = event.key.toLowerCase();
+      const command = event.ctrlKey || event.metaKey;
+      const devtools = event.key === 'F12' || (command && event.shiftKey && ['i','j','c'].includes(key)) || (event.metaKey && event.altKey && ['i','j','c'].includes(key));
+      const pageShortcuts = command && ['u','s','p'].includes(key);
+      const clipboardShortcuts = command && ['c','x','a'].includes(key) && !isFormField(event.target);
+      if(devtools || pageShortcuts || clipboardShortcuts){ event.preventDefault(); event.stopImmediatePropagation(); }
+    }, true);
+  })();
+  </script>
 </body>
 </html>

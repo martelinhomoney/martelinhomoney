@@ -1,10 +1,17 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <title>Martelinho Money</title>
+<link rel="icon" href="img/logo-redonda.webp" type="image/webp">
 <meta name="claude:viewport-fit-sides" content="cover">
 <!-- Instale o pixel nesta página para rastrear apenas quem inicia o quiz. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<script async src="https://painel-lucro-ten.vercel.app/tracker.js" data-pixel-id="c914e010-7791-40ee-bd8a-2d584587eaf5" data-pl-type="quiz_vsl" data-pl-consent="auto"></script>
 <style>
 /* Layout: one narrow column (max 480px), one screen at a time. The only bold graphic is the light-board reflection
    that bends around a dent, the thing a martelinho technician actually reads. Gold is the single accent. */
@@ -297,6 +304,8 @@ h1.hm, h2.hm, h1:has(mark){line-height:1.28 !important}
 .player .ph{display:grid; justify-items:center; gap:10px; padding:16px; text-align:center}
 .playbtn{width:68px; height:68px; border-radius:50%; background:var(--gold); color:var(--on-gold); display:grid; place-items:center}
 .player .ph p{margin:0; font-size:15px; opacity:.85}
+.vsl-cta-wrap{width:100%; max-width:420px; margin:14px auto 0}
+.vsl-cta-wrap .cta{margin-top:0}
 
 .legal{max-width:480px; margin:0 auto; padding-block:6px 28px; font-size:12px; line-height:1.4; color:var(--muted); text-align:center; opacity:.8}
 .toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); max-width:min(440px, calc(100% - 32px)); background:var(--ink); color:var(--bg); padding:12px 16px; border-radius:10px; font-size:15px; font-weight:600; z-index:20}
@@ -305,7 +314,8 @@ h1.hm, h2.hm, h1:has(mark){line-height:1.28 !important}
   *, *::before, *::after{animation:none !important; transition:none !important}
 }
 </style>
-
+</head>
+<body>
 <div class="app">
   <header>
     <div class="top">
@@ -348,6 +358,30 @@ function track(name, data){
     const std = {Lead:1, ViewContent:1, InitiateCheckout:1};
     window.fbq(std[name] ? 'track' : 'trackCustom', name, data || {});
   }catch(e){}
+}
+
+function withPainelLucro(callback){
+  if(window.PainelLucro){ callback(window.PainelLucro); return; }
+  const trackerScript = document.querySelector('script[data-pixel-id="c914e010-7791-40ee-bd8a-2d584587eaf5"]');
+  if(!trackerScript) return;
+  trackerScript.addEventListener('load', () => {
+    if(window.PainelLucro) callback(window.PainelLucro);
+  }, {once:true});
+}
+
+const PAINEL_LUCRO_QUIZ_STEPS = {exp:1, dor:2, tempo:3, desejo:4, perfil:5, fecho:6};
+function recordPainelLucroAnswer(screen){
+  const step = PAINEL_LUCRO_QUIZ_STEPS[screen.key];
+  const option = (OPTS[screen.key] || []).find(item => item.k === answers[screen.key]);
+  if(!step || !option) return;
+  const question = screen.q.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  withPainelLucro(api => api.answer(step, question, option.t));
+}
+let painelLucroQuizCompleted = false;
+function completePainelLucroQuiz(){
+  if(painelLucroQuizCompleted) return;
+  painelLucroQuizCompleted = true;
+  withPainelLucro(api => api.complete());
 }
 
 const $stage = document.getElementById('stage');
@@ -684,7 +718,7 @@ const screens = [
       '<div style="text-align:center"><span class="tag">' + ICON.play + ' Aula gratuita</span></div>' +
       '<h1 class="t" tabindex="-1" style="text-align:center">Dá o play e assista até o final.</h1>' +
       '<div class="player" id="player"><div class="ph"><span class="playbtn">' + ICON.play + '</span><p>O vídeo da VSL entra aqui</p></div></div>' +
-      '<a class="cta glow" id="buy" href="#" hidden>' + CONFIG.ctaLabel + ' ' + ICON.arrow + '</a></section>' }
+      '<div class="vsl-cta-wrap"><a class="cta glow" id="buy" href="#" data-pl-cta data-pl-label="Oferta da aula gratuita" data-pl-vsl-cta hidden>' + CONFIG.ctaLabel + ' ' + ICON.arrow + '</a></div></section>' }
 ];
 
 /* ===== Motor ===== */
@@ -694,11 +728,12 @@ let timers = [];
 let analysisReady = false;
 let analysisGoalAnswered = false;
 let resumeAnalysis = null;
-let vslCtaCleanup = null;
+let vslPlayerCleanup = null;
 
 function finishAnalysis(){
   if(!analysisReady || !analysisGoalAnswered || screens[idx].id !== 'analise') return;
   analysisReady = false;
+  completePainelLucroQuiz();
   idx++;
   render();
 }
@@ -733,47 +768,40 @@ function mountEmbed(el, html){
   });
 }
 
-function watchVslCta(host, button, revealAt){
-  let revealed = false;
+function watchVslPlayer(host, button){
   const cleanups = [];
-  const reveal = () => {
-    if(revealed) return;
-    revealed = true;
-    button.hidden = false;
-  };
-  const onTime = event => {
-    const time = Number(event && event.detail && event.detail.time);
-    if(Number.isFinite(time) && time >= revealAt) reveal();
-  };
-  const listenForTime = target => {
-    if(!target || typeof target.addEventListener !== 'function') return;
-    target.addEventListener('video:timeupdate', onTime);
-    cleanups.push(() => target.removeEventListener('video:timeupdate', onTime));
-  };
-  const scheduleOnPlayer = player => {
-    if(!player || typeof player.onTime !== 'function') return;
-    try{ player.onTime(revealAt, reveal, {once:true}); }catch(e){}
-  };
   const boundPlayers = new WeakSet();
-  const bindCustomPlayer = () => {
-    const customPlayer = host.querySelector('vturb-smartplayer');
-    if(!customPlayer || boundPlayers.has(customPlayer)) return;
-    boundPlayers.add(customPlayer);
-    listenForTime(customPlayer);
-    const onReady = event => scheduleOnPlayer(event.detail && event.detail.player || customPlayer);
-    customPlayer.addEventListener('player:ready', onReady, {once:true});
-    cleanups.push(() => customPlayer.removeEventListener('player:ready', onReady));
+  const bindWistiaPlayer = player => {
+    if(boundPlayers.has(player)) return;
+    boundPlayers.add(player);
+    const sendVideo = state => {
+      const currentTime = Number(player.currentTime);
+      const duration = Number(player.duration);
+      if(!Number.isFinite(currentTime)) return;
+      if(currentTime >= CONFIG.ctaTimeSeconds) button.hidden = false;
+      if(duration > 0){
+        withPainelLucro(api => api.video('vsl-principal', currentTime, duration, state));
+      }
+    };
+    const onPlay = () => sendVideo('play');
+    const onPause = () => sendVideo('pause');
+    const onEnded = () => sendVideo('ended');
+    const onTimeUpdate = () => sendVideo();
+    player.addEventListener('play', onPlay);
+    player.addEventListener('pause', onPause);
+    player.addEventListener('ended', onEnded);
+    player.addEventListener('time-update', onTimeUpdate);
+    cleanups.push(() => {
+      player.removeEventListener('play', onPlay);
+      player.removeEventListener('pause', onPause);
+      player.removeEventListener('ended', onEnded);
+      player.removeEventListener('time-update', onTimeUpdate);
+    });
   };
-  const observer = new MutationObserver(bindCustomPlayer);
+  const bindPlayers = () => host.querySelectorAll('wistia-player').forEach(bindWistiaPlayer);
+  const observer = new MutationObserver(bindPlayers);
   observer.observe(host, {childList:true, subtree:true});
-  bindCustomPlayer();
-  const onIframeConnected = event => {
-    if(!event.detail || event.detail.id !== 'player_mwsfmwacpec9') return;
-    scheduleOnPlayer(event.detail.player);
-    listenForTime(event.target);
-  };
-  document.addEventListener('iframe:connected', onIframeConnected);
-  cleanups.push(() => document.removeEventListener('iframe:connected', onIframeConnected));
+  bindPlayers();
   cleanups.push(() => observer.disconnect());
   return () => cleanups.forEach(cleanup => cleanup());
 }
@@ -851,7 +879,7 @@ function initTestimonialAudio(){
 
 function render(){
   clearTimers();
-  if(vslCtaCleanup){ vslCtaCleanup(); vslCtaCleanup = null; }
+  if(vslPlayerCleanup){ vslPlayerCleanup(); vslPlayerCleanup = null; }
   const s = screens[idx];
   document.querySelector('.app').classList.toggle('vsl-active', !!s.vsl);
   $stage.innerHTML = s.html ? s.html() : qScreen(s);
@@ -928,7 +956,11 @@ function render(){
     track('ViewContent', {content_name:'VSL'});
     const player = document.getElementById('player');
     const buy = document.getElementById('buy');
-    if(player && buy) vslCtaCleanup = watchVslCta(player, buy, CONFIG.ctaTimeSeconds);
+    if(player && buy) vslPlayerCleanup = watchVslPlayer(player, buy);
+    if(buy && CONFIG.checkoutUrl){
+      buy.href = CONFIG.checkoutUrl;
+      buy.setAttribute('data-pl-checkout', '');
+    }
     if(CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
   }
 }
@@ -948,6 +980,7 @@ $stage.addEventListener('click', e => {
   const goal = e.target.closest('.goal-option');
   if(goal){
     answers.objetivo = goal.dataset.goal;
+    withPainelLucro(api => api.answer(7, 'Se você começasse a fazer reparos, o que gostaria de conquistar primeiro?', answers.objetivo));
     $stage.querySelectorAll('.goal-option').forEach(b => b.setAttribute('aria-pressed', String(b === goal)));
     analysisGoalAnswered = true;
     const modal = document.getElementById('goal-modal');
@@ -980,6 +1013,8 @@ $stage.addEventListener('click', e => {
   const next = e.target.closest('#next');
   if(next){
     if(next.getAttribute('aria-disabled') === 'true') return;
+    const screen = screens[idx];
+    if(screen.key) recordPainelLucroAnswer(screen);
     go(idx + 1);
   }
 });
@@ -1062,6 +1097,24 @@ $back.addEventListener('click', () => {
   track('QuizStart');
   render();
 });
+
+(() => {
+  const isFormField = target => !!(target && target.closest && target.closest('input,textarea,select,[contenteditable="true"]'));
+  const blockOutsideFields = event => { if(!isFormField(event.target)) event.preventDefault(); };
+  const style = document.createElement('style');
+  style.textContent = 'body,body *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}input,textarea,select,[contenteditable="true"]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default!important}';
+  document.head.appendChild(style);
+  ['contextmenu','copy','cut','selectstart'].forEach(type => document.addEventListener(type, blockOutsideFields, true));
+  document.addEventListener('dragstart', event => { if(event.target.closest && event.target.closest('img,video,a')) event.preventDefault(); }, true);
+  document.addEventListener('keydown', event => {
+    const key = event.key.toLowerCase();
+    const command = event.ctrlKey || event.metaKey;
+    const devtools = event.key === 'F12' || (command && event.shiftKey && ['i','j','c'].includes(key)) || (event.metaKey && event.altKey && ['i','j','c'].includes(key));
+    const pageShortcuts = command && ['u','s','p'].includes(key);
+    const clipboardShortcuts = command && ['c','x','a'].includes(key) && !isFormField(event.target);
+    if(devtools || pageShortcuts || clipboardShortcuts){ event.preventDefault(); event.stopImmediatePropagation(); }
+  }, true);
+})();
 
 render();
 </script>
