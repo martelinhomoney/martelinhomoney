@@ -738,7 +738,12 @@ const screens = [
           '<button type="submit" class="cta big glow" id="send" aria-disabled="true">' + ICON.play + ' Liberar aula gratuita</button></form></section>';
     } },
 
-  { id:'vsl', vsl:true, html:() => '<section class="screen">' +
+{ id:'vsl', vsl:true, html:() => '<section class="screen">' +
+      '<div class="vsl-boot" id="vsl-boot" role="status" aria-live="polite"><div class="vsl-boot-box">' +
+        '<div class="vsl-spin" aria-hidden="true"></div>' +
+        '<div class="vsl-boot-t">Preparando sua aula gratuita...</div>' +
+        '<div class="vsl-boot-s">Liberando o vídeo exclusivo pra você</div>' +
+      '</div></div>' +
       '<div style="text-align:center"><span class="tag">' + ICON.play + ' Aula gratuita</span></div>' +
       '<h1 class="t" tabindex="-1" style="text-align:center">Dá o play e assista até o final.</h1>' +
       '<div class="player" id="player"><div class="ph"><span class="playbtn">' + ICON.play + '</span><p>O vídeo da VSL entra aqui</p></div></div>' +
@@ -980,15 +985,20 @@ function render(){
     track('ViewContent', {content_name:'VSL'});
     const player = document.getElementById('player');
     const buy = document.getElementById('buy');
+    const boot = document.getElementById('vsl-boot');
     if(player && buy) vslPlayerCleanup = watchVslPlayer(player, buy);
     if(buy && CONFIG.checkoutUrl){
       buy.href = CONFIG.checkoutUrl;
       buy.setAttribute('data-pl-checkout', '');
     }
     if(CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
+    if(boot){
+      later(() => {
+        boot.classList.add('hide');
+        later(() => boot.remove(), 300);
+      }, 2500);
+    }
   }
-}
-
 function go(n){
   history.push(idx);
   idx = n;
