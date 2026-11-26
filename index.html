@@ -50,6 +50,24 @@
   </div>
   <script>
   (function(){
+    const link = document.querySelector('a.cta[href*="quiz.html"]');
+    if (!link) return;
+    function syncQuizHref() {
+      const currentParams = new URLSearchParams(window.location.search);
+      if (![...currentParams.keys()].length) return;
+      const targetUrl = new URL(link.getAttribute('href'), window.location.href);
+      currentParams.forEach((value, key) => {
+        if (!targetUrl.searchParams.has(key)) targetUrl.searchParams.set(key, value);
+      });
+      link.setAttribute('href', targetUrl.pathname + targetUrl.search + targetUrl.hash);
+    }
+    syncQuizHref();
+    window.addEventListener('load', syncQuizHref);
+    link.addEventListener('pointerdown', syncQuizHref, true);
+    link.addEventListener('click', syncQuizHref, true);
+    link.addEventListener('auxclick', syncQuizHref, true);
+  })();
+  (function(){
     const isFormField = target => !!(target && target.closest && target.closest('input,textarea,select,[contenteditable="true"]'));
     const blockOutsideFields = event => { if(!isFormField(event.target)) event.preventDefault(); };
     const style = document.createElement('style');
