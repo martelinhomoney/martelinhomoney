@@ -992,13 +992,15 @@ function render(){
       buy.setAttribute('data-pl-checkout', '');
     }
     if(CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
-    if(boot){
+   if(boot){
       later(() => {
         boot.classList.add('hide');
         later(() => boot.remove(), 300);
       }, 2500);
     }
   }
+}
+
 function go(n){
   history.push(idx);
   idx = n;
@@ -1147,9 +1149,13 @@ $back.addEventListener('click', () => {
   document.head.appendChild(style);
   ['contextmenu','copy','cut','selectstart'].forEach(type => document.addEventListener(type, blockOutsideFields, true));
   document.addEventListener('dragstart', event => { if(event.target.closest && event.target.closest('img,video,a')) event.preventDefault(); }, true);
-  document.addEventListener('keydown', event => {
+ document.addEventListener('keydown', event => {
+    if(!event.key) return;
     const key = event.key.toLowerCase();
     const command = event.ctrlKey || event.metaKey;
+```[cite: 11]
+
+Lembre-se de garantir também a `}` que fecha `render()` logo antes de `function go(n){`[cite: 11]. Assim que salvar e a Vercel atualizar o *deploy*, o quiz volta a renderizar sem o `SyntaxError` nem o erro de `toLowerCase` no console[cite: 5, 10, 11].
     const devtools = event.key === 'F12' || (command && event.shiftKey && ['i','j','c'].includes(key)) || (event.metaKey && event.altKey && ['i','j','c'].includes(key));
     const pageShortcuts = command && ['u','s','p'].includes(key);
     const clipboardShortcuts = command && ['c','x','a'].includes(key) && !isFormField(event.target);
