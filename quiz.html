@@ -1017,14 +1017,21 @@ $stage.addEventListener('click', e => {
     try{ nx.scrollIntoView({block:'nearest', behavior:reduceMotion() ? 'auto' : 'smooth'}); }catch(err){}
     return;
   }
-  const buy = e.target.closest('#buy');
+ const buy = e.target.closest('#buy');
   if(buy){
     track('InitiateCheckout');
     if(!CONFIG.checkoutUrl){
       e.preventDefault();
       toast('Defina o link de checkout em CONFIG.checkoutUrl.');
     }else{
-      buy.setAttribute('href', CONFIG.checkoutUrl);
+      const checkoutUrl = new URL(CONFIG.checkoutUrl, window.location.href);
+      const pageParams = new URLSearchParams(window.location.search);
+      pageParams.forEach((value, key) => {
+        if(value && !checkoutUrl.searchParams.has(key)){
+          checkoutUrl.searchParams.set(key, value);
+        }
+      });
+      buy.href = checkoutUrl.toString();
     }
     return;
   }
