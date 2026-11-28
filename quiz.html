@@ -130,8 +130,10 @@ strong{font-weight:700}
 .cta[aria-disabled="true"],
 .cta:disabled{
   background:#2A3138;
-  color:#8D98A3;
+  color:#76828E;
+  border:1px solid #38424B;
   box-shadow:none;
+  opacity:0.75;
   cursor:not-allowed;
   transform:none;
   pointer-events:none;
@@ -148,11 +150,14 @@ strong{font-weight:700}
   filter:blur(8px);
   animation:haloPulse 1.55s ease-in-out infinite;
 }
-.cta.glow[aria-disabled="true"],
-.cta.glow[aria-disabled="true"]::after{
+.cta.glow[aria-disabled="true"]{
   animation:none !important;
-  opacity:0;
 }
+.cta.glow[aria-disabled="true"]::after{
+  display:none !important;
+  content:none !important;
+}
+```[cite: 2]
 .vsl-cta-hidden{
   opacity:0 !important;
   pointer-events:none !important;
