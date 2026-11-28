@@ -157,7 +157,6 @@ strong{font-weight:700}
   display:none !important;
   content:none !important;
 }
-```[cite: 2]
 .vsl-cta-hidden{
   display:none !important;
 }
@@ -1084,7 +1083,12 @@ function render(){
       buy.setAttribute('data-pl-checkout', '');
     }
     if(player && CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
-    if(player && buy) vslPlayerCleanup = watchVslPlayer(player, buy);
+    if(player && buy){
+      buy.hidden = false;
+      buy.classList.remove('vsl-cta-hidden');
+      buy.classList.add('glow');
+      vslPlayerCleanup = watchVslPlayer(player, buy);
+    }
    if(boot){
       later(() => {
         boot.classList.add('hide');
