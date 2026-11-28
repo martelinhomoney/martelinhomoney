@@ -1083,12 +1083,7 @@ function render(){
       buy.setAttribute('data-pl-checkout', '');
     }
     if(player && CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
-    if(player && buy){
-      buy.hidden = false;
-      buy.classList.remove('vsl-cta-hidden');
-      buy.classList.add('glow');
-      vslPlayerCleanup = watchVslPlayer(player, buy);
-    }
+    if(player && buy) vslPlayerCleanup = watchVslPlayer(player, buy);
    if(boot){
       later(() => {
         boot.classList.add('hide');
@@ -1240,7 +1235,6 @@ $back.addEventListener('click', () => {
   render();
 });
 
-/* bloqueios temporariamente desativados para teste
 (() => {
   const isFormField = target => !!(target && target.closest && target.closest('input,textarea,select,[contenteditable="true"]'));
   const blockOutsideFields = event => { if(!isFormField(event.target)) event.preventDefault(); };
@@ -1259,7 +1253,6 @@ $back.addEventListener('click', () => {
     if(devtools || pageShortcuts || clipboardShortcuts){ event.preventDefault(); event.stopImmediatePropagation(); }
   }, true);
 })();
-*/
 
 render();
 </script>
