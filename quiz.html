@@ -141,13 +141,48 @@ strong{font-weight:700}
   animation:none !important;
   opacity:0;
 }
-@keyframes btnPulse{
-  0%,100%{transform:scale(1); box-shadow:0 4px 0 var(--gold-press), 0 0 14px rgba(242,176,30,.32)}
-  50%{transform:scale(1.035); box-shadow:0 4px 0 var(--gold-press), 0 0 24px rgba(242,176,30,.62)}
+.vsl-cta-hidden{
+  opacity:0 !important;
+  pointer-events:none !important;
+  position:absolute !important;
+  left:-9999px !important;
+  animation:none !important;
 }
-@keyframes haloPulse{
+.vsl-cta-hidden::after{
+  display:none !important;
+  content:none !important;
+}
+#buy.cta.glow:not(.vsl-cta-hidden){
+  position:relative;
+  z-index:1;
+  transform-origin:center center;
+  will-change:transform, box-shadow;
+  animation:vslCheckoutPulse 1.25s ease-in-out infinite !important;
+}
+#buy.cta.glow:not(.vsl-cta-hidden)::after{
+  content:"";
+  position:absolute;
+  inset:-7px;
+  z-index:-1;
+  border-radius:16px;
+  pointer-events:none;
+  background:radial-gradient(circle, rgba(242,176,30,.62) 0%, rgba(242,176,30,.26) 58%, rgba(242,176,30,0) 82%);
+  filter:blur(10px);
+  animation:vslCheckoutHalo 1.25s ease-in-out infinite !important;
+}
+@keyframes vslCheckoutPulse{
+  0%,100%{
+    transform:scale(1);
+    box-shadow:0 4px 0 var(--gold-press), 0 0 14px rgba(242,176,30,.38);
+  }
+  50%{
+    transform:scale(1.055);
+    box-shadow:0 6px 0 var(--gold-press), 0 0 30px rgba(242,176,30,.85);
+  }
+}
+@keyframes vslCheckoutHalo{
   0%,100%{opacity:.45; transform:scale(.96)}
-  50%{opacity:.95; transform:scale(1.07)}
+  50%{opacity:1; transform:scale(1.08)}
 }
 
 /* art */
@@ -774,7 +809,7 @@ const screens = [
       '<div style="text-align:center"><span class="tag">' + ICON.play + ' Aula gratuita</span></div>' +
       '<h1 class="t" tabindex="-1" style="text-align:center">Dá o play e assista até o final.</h1>' +
       '<div class="player" id="player"><div class="ph"><span class="playbtn">' + ICON.play + '</span><p>O vídeo da VSL entra aqui</p></div></div>' +
-      '<div class="vsl-cta-wrap"><a class="cta glow" id="buy" href="#" data-pl-cta data-pl-label="Oferta da aula gratuita" data-pl-vsl-cta hidden>' + CONFIG.ctaLabel + ' ' + ICON.arrow + '</a></div></section>' }
+      '<div class="vsl-cta-wrap"><a class="cta glow vsl-cta-hidden" id="buy" href="' + CONFIG.checkoutUrl + '" data-pl-cta data-pl-label="Oferta da aula gratuita" data-pl-vsl-cta>' + CONFIG.ctaLabel + ' ' + ICON.arrow + '</a></div></section>' }
 ];
 
 /* ===== Motor ===== */
@@ -836,6 +871,7 @@ function watchVslPlayer(host, button){
       if(!Number.isFinite(currentTime)) return;
       if(currentTime >= CONFIG.ctaTimeSeconds){
         button.hidden = false;
+        button.classList.remove('vsl-cta-hidden');
         button.classList.add('glow');
       }
       if(duration > 0){
@@ -1067,6 +1103,7 @@ $stage.addEventListener('click', e => {
   }
  const buy = e.target.closest('#buy');
   if(buy){
+    track('InitiateCheckout', { content_name: 'Martelinho Money VSL' });
     if(!CONFIG.checkoutUrl){
       e.preventDefault();
       toast('Defina o link de checkout em CONFIG.checkoutUrl.');
