@@ -130,10 +130,15 @@ strong{font-weight:700}
 .cta[aria-disabled="true"]{background:var(--trk); color:var(--muted); box-shadow:none; cursor:not-allowed; transform:none}
 .cta.glow{position:relative; z-index:1; animation:btnPulse 1.55s ease-in-out infinite}
 .cta.glow::after{
-  content:""; position:absolute; inset:-6px; z-index:-1; border-radius:14px; pointer-events:none;
-  background:radial-gradient(circle, rgba(242,176,30,.48) 0%, rgba(242,176,30,.18) 58%, rgba(242,176,30,0) 78%);
-  filter:blur(10px);
+  content:""; position:absolute; inset:-4px; z-index:-1; border-radius:14px; pointer-events:none;
+  background:radial-gradient(circle, rgba(242,176,30,.42) 0%, rgba(242,176,30,.14) 60%, rgba(242,176,30,0) 80%);
+  filter:blur(8px);
   animation:haloPulse 1.55s ease-in-out infinite;
+}
+.cta.glow[aria-disabled="true"],
+.cta.glow[aria-disabled="true"]::after{
+  animation:none !important;
+  opacity:0;
 }
 @keyframes btnPulse{
   0%,100%{transform:scale(1); box-shadow:0 4px 0 var(--gold-press), 0 0 14px rgba(242,176,30,.32)}
@@ -328,7 +333,8 @@ h1.hm, h2.hm, h1:has(mark){line-height:1.28 !important}
 .steps .st{flex:none; width:26px; height:26px; border-radius:50%; border:2px solid var(--line); display:grid; place-items:center; color:transparent}
 .steps li.done{color:var(--ink); border-color:var(--money)}
 .steps li.done .st{background:var(--money); border-color:var(--money); color:var(--surface)}
-.steps li.run .st{border-color:var(--gold); border-top-color:transparent; animation:spin .8s linear infinite}
+.steps li.run{color:var(--ink); border-color:var(--gold)}
+.steps li.run .st{border-color:rgba(242,176,30,.28); border-top-color:var(--gold); color:var(--gold); animation:spin .75s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* vsl */
@@ -827,7 +833,10 @@ function watchVslPlayer(host, button){
       const currentTime = Number(player.currentTime);
       const duration = Number(player.duration);
       if(!Number.isFinite(currentTime)) return;
-      if(currentTime >= CONFIG.ctaTimeSeconds) button.hidden = false;
+      if(currentTime >= CONFIG.ctaTimeSeconds){
+        button.hidden = false;
+        button.classList.add('glow');
+      }
       if(duration > 0){
         withPainelLucro(api => api.video('vsl-principal', currentTime, duration, state));
       }
