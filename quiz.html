@@ -160,15 +160,6 @@ strong{font-weight:700}
 ```[cite: 2]
 .vsl-cta-hidden{
   display:none !important;
-  opacity:0 !important;
-  pointer-events:none !important;
-  position:absolute !important;
-  left:-9999px !important;
-  animation:none !important;
-}
-.vsl-cta-hidden::after{
-  display:none !important;
-  content:none !important;
 }
 #buy.cta.glow:not(.vsl-cta-hidden){
   position:relative;
@@ -184,7 +175,7 @@ strong{font-weight:700}
   z-index:-1;
   border-radius:16px;
   pointer-events:none;
-  background:radial-gradient(circle, rgba(242,176,30,.62) 0%, rgba(242,176,30,.26) 58%, rgba(242,176,30,0) 82%);
+  background:radial-gradient(circle, rgba(242,176,30,.65) 0%, rgba(242,176,30,.28) 58%, rgba(242,176,30,0) 82%);
   filter:blur(10px);
   animation:vslCheckoutHalo 1.25s ease-in-out infinite !important;
 }
