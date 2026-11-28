@@ -827,7 +827,7 @@ const screens = [
       '<div style="text-align:center"><span class="tag">' + ICON.play + ' Aula gratuita</span></div>' +
       '<h1 class="t" tabindex="-1" style="text-align:center">Dá o play e assista até o final.</h1>' +
       '<div class="player" id="player"><div class="ph"><span class="playbtn">' + ICON.play + '</span><p>O vídeo da VSL entra aqui</p></div></div>' +
-      '<div class="vsl-cta-wrap"><a class="cta vsl-cta-hidden" id="buy" href="' + CONFIG.checkoutUrl + '" data-pl-cta data-pl-label="Oferta da aula gratuita" data-pl-vsl-cta hidden>' + CONFIG.ctaLabel + ' ' + ICON.arrow + '</a></div></section>' }
+      '<div class="vsl-cta-wrap"><button type="button" class="cta vsl-cta-hidden" id="buy" data-checkout-url="' + CONFIG.checkoutUrl + '" data-pl-cta data-pl-label="Oferta da aula gratuita" data-pl-vsl-cta hidden>' + CONFIG.ctaLabel + ' ' + ICON.arrow + '</button></div></section>' }
 ];
 
 /* ===== Motor ===== */
@@ -1089,7 +1089,7 @@ function render(){
     const buy = document.getElementById('buy');
     const boot = document.getElementById('vsl-boot');
     if(buy && CONFIG.checkoutUrl){
-      buy.href = CONFIG.checkoutUrl;
+      buy.dataset.checkoutUrl = CONFIG.checkoutUrl;
       buy.setAttribute('data-pl-checkout', '');
     }
     if(player && CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
@@ -1140,18 +1140,18 @@ $stage.addEventListener('click', e => {
  const buy = e.target.closest('#buy');
   if(buy){
     track('InitiateCheckout', { content_name: 'Martelinho Money VSL' });
-    if(!CONFIG.checkoutUrl){
-      e.preventDefault();
+    const targetUrl = buy.dataset.checkoutUrl || CONFIG.checkoutUrl;
+    if(!targetUrl){
       toast('Defina o link de checkout em CONFIG.checkoutUrl.');
     }else{
-      const checkoutUrl = new URL(CONFIG.checkoutUrl, window.location.href);
+      const checkoutUrl = new URL(targetUrl, window.location.href);
       const pageParams = new URLSearchParams(window.location.search);
       pageParams.forEach((value, key) => {
         if(value && !checkoutUrl.searchParams.has(key)){
           checkoutUrl.searchParams.set(key, value);
         }
       });
-      buy.href = checkoutUrl.toString();
+      window.location.assign(checkoutUrl.toString());
     }
     return;
   }
