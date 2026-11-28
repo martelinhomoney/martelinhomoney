@@ -35,7 +35,7 @@
   <div class="page">
     <header class="brand" aria-label="Martelinho Money"><span>Martelinho <b>Money</b></span></header>
     <main>
-      <img class="hero-image" src="img/intro-quiz.webp" alt="Reparo de um amassado na lataria">
+      <img class="hero-image" src="img/intro-quiz.webp" alt="Reparo de um amassado na lataria" fetchpriority="high" decoding="async">
       <h1>Será que Martelinho de Ouro é pra você?</h1>
       <p class="sub">Responda algumas perguntas rápidas, descubra se você tem perfil pra começar a faturar com reparos automotivos e receba uma <mark>aula gratuita</mark> no final.</p>
       <p class="small">
@@ -53,13 +53,15 @@
     const link = document.querySelector('a.cta[href*="quiz.html"]');
     if (!link) return;
     function syncQuizHref() {
-      const currentParams = new URLSearchParams(window.location.search);
-      if (![...currentParams.keys()].length) return;
-      const targetUrl = new URL(link.getAttribute('href'), window.location.href);
-      currentParams.forEach((value, key) => {
-        if (!targetUrl.searchParams.has(key)) targetUrl.searchParams.set(key, value);
-      });
-      link.setAttribute('href', targetUrl.pathname + targetUrl.search + targetUrl.hash);
+      try {
+        const currentParams = new URLSearchParams(window.location.search);
+        if (!currentParams.toString()) return;
+        const targetUrl = new URL(link.getAttribute('href'), window.location.href);
+        currentParams.forEach((value, key) => {
+          if (!targetUrl.searchParams.has(key)) targetUrl.searchParams.set(key, value);
+        });
+        link.setAttribute('href', targetUrl.pathname + targetUrl.search + targetUrl.hash);
+      } catch (e) {}
     }
     syncQuizHref();
     window.addEventListener('load', syncQuizHref);
