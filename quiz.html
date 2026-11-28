@@ -159,6 +159,7 @@ strong{font-weight:700}
 }
 ```[cite: 2]
 .vsl-cta-hidden{
+  display:none !important;
   opacity:0 !important;
   pointer-events:none !important;
   position:absolute !important;
@@ -826,7 +827,7 @@ const screens = [
       '<div style="text-align:center"><span class="tag">' + ICON.play + ' Aula gratuita</span></div>' +
       '<h1 class="t" tabindex="-1" style="text-align:center">Dá o play e assista até o final.</h1>' +
       '<div class="player" id="player"><div class="ph"><span class="playbtn">' + ICON.play + '</span><p>O vídeo da VSL entra aqui</p></div></div>' +
-      '<div class="vsl-cta-wrap"><a class="cta glow vsl-cta-hidden" id="buy" href="' + CONFIG.checkoutUrl + '" data-pl-cta data-pl-label="Oferta da aula gratuita" data-pl-vsl-cta>' + CONFIG.ctaLabel + ' ' + ICON.arrow + '</a></div></section>' }
+      '<div class="vsl-cta-wrap"><a class="cta vsl-cta-hidden" id="buy" href="' + CONFIG.checkoutUrl + '" data-pl-cta data-pl-label="Oferta da aula gratuita" data-pl-vsl-cta hidden>' + CONFIG.ctaLabel + ' ' + ICON.arrow + '</a></div></section>' }
 ];
 
 /* ===== Motor ===== */
@@ -879,37 +880,55 @@ function mountEmbed(el, html){
 function watchVslPlayer(host, button){
   const cleanups = [];
   const boundPlayers = new WeakSet();
+
+  const setVisible = visible => {
+    button.hidden = !visible;
+    button.classList.toggle('vsl-cta-hidden', !visible);
+    button.classList.toggle('glow', visible);
+  };
+
+  setVisible(false);
+
   const bindWistiaPlayer = player => {
     if(boundPlayers.has(player)) return;
     boundPlayers.add(player);
-    const sendVideo = state => {
+
+    const checkCta = () => {
       const currentTime = Number(player.currentTime);
       const duration = Number(player.duration);
-      if(!Number.isFinite(currentTime)) return;
-      if(currentTime >= CONFIG.ctaTimeSeconds){
-        button.hidden = false;
-        button.classList.remove('vsl-cta-hidden');
-        button.classList.add('glow');
-      }
-      if(duration > 0){
+      const reached = Number.isFinite(currentTime) && Number.isFinite(duration) && duration > 0 && currentTime >= CONFIG.ctaTimeSeconds;
+      if(reached) setVisible(true);
+    };
+
+    const sendVideo = state => {
+      checkCta();
+      const currentTime = Number(player.currentTime);
+      const duration = Number(player.duration);
+      if(Number.isFinite(currentTime) && duration > 0){
         withPainelLucro(api => api.video('vsl-principal', currentTime, duration, state));
       }
     };
+
     const onPlay = () => sendVideo('play');
     const onPause = () => sendVideo('pause');
     const onEnded = () => sendVideo('ended');
-    const onTimeUpdate = () => sendVideo();
+    const onTimeUpdate = () => checkCta();
+
     player.addEventListener('play', onPlay);
     player.addEventListener('pause', onPause);
     player.addEventListener('ended', onEnded);
     player.addEventListener('time-update', onTimeUpdate);
+    player.addEventListener('timeupdate', onTimeUpdate);
+
     cleanups.push(() => {
       player.removeEventListener('play', onPlay);
       player.removeEventListener('pause', onPause);
       player.removeEventListener('ended', onEnded);
       player.removeEventListener('time-update', onTimeUpdate);
+      player.removeEventListener('timeupdate', onTimeUpdate);
     });
   };
+
   const bindPlayers = () => host.querySelectorAll('wistia-player').forEach(bindWistiaPlayer);
   const observer = new MutationObserver(bindPlayers);
   observer.observe(host, {childList:true, subtree:true});
@@ -1069,12 +1088,12 @@ function render(){
     const player = document.getElementById('player');
     const buy = document.getElementById('buy');
     const boot = document.getElementById('vsl-boot');
-    if(player && buy) vslPlayerCleanup = watchVslPlayer(player, buy);
     if(buy && CONFIG.checkoutUrl){
       buy.href = CONFIG.checkoutUrl;
       buy.setAttribute('data-pl-checkout', '');
     }
-    if(CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
+    if(player && CONFIG.vslEmbed) mountEmbed(player, CONFIG.vslEmbed);
+    if(player && buy) vslPlayerCleanup = watchVslPlayer(player, buy);
    if(boot){
       later(() => {
         boot.classList.add('hide');
