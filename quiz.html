@@ -127,8 +127,20 @@ strong{font-weight:700}
   box-shadow:0 4px 0 var(--gold-press); cursor:pointer; text-decoration:none; text-align:center;
 }
 .cta:active{transform:translateY(3px) scale(.99) !important; box-shadow:0 1px 0 var(--gold-press)}
-.cta[aria-disabled="true"]{background:var(--trk); color:var(--muted); box-shadow:none; cursor:not-allowed; transform:none; pointer-events:none}
-.cta.glow[aria-disabled="true"]::after{display:none; content:none}
+.cta[aria-disabled="true"],
+.cta:disabled{
+  background:#2A3138;
+  color:#8D98A3;
+  box-shadow:none;
+  cursor:not-allowed;
+  transform:none;
+  pointer-events:none;
+}
+.cta.glow[aria-disabled="true"]::after,
+.cta.glow:disabled::after{
+  display:none;
+  content:none;
+}
 .cta.glow{position:relative; z-index:1; animation:btnPulse 1.55s ease-in-out infinite}
 .cta.glow::after{
   content:""; position:absolute; inset:-4px; z-index:-1; border-radius:14px; pointer-events:none;
